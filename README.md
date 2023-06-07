@@ -1,10 +1,14 @@
-# Demo Library
-This project is a library for padding Strings in Java.
+# Payfast Java Library Implementation [unofficial]
+
+This can be used on the server side applications or used in other client application like your javafx, android applications.
+
+Feel free to contribute as well .
+
 
 ---
 **WARNING**
 
-Don't use this in production. It was created for demo purposes only.
+Don't use this yet . This is not event complete there are still some errors or even compile time errors
 
 ---
 
@@ -13,18 +17,16 @@ Don't use this in production. It was created for demo purposes only.
 Add the following dependency:
 ````XML
 <dependency>
-    <groupId>com.thegreatapi.demolibrary</groupId>
-    <artifactId>demolibrary</artifactId>
-    <version>${VERSION}</version>
+    <groupId>com.payfast</groupId>
+    <artifactId>payfast</artifactId>
+    <version>0.1.0</version>
 </dependency>
 ````
-The folling code
+The following code
 ````java
-String paddedString = this.stringPadder.padLeft("My String", 30, '-');
-System.out.println(paddedString);
-````
-Will print:
+
+// demo coming soon
 
 ````
----------------------My String
-````
+
+This is a part-time project ,it's not a priority to me yet so updates maybe very slow!
