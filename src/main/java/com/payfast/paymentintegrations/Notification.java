@@ -3,12 +3,11 @@ package com.payfast.paymentintegrations;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.payfast.HttpUtils;
+import com.payfast.PayFast;
 import com.payfast.PayFastPayment;
 import com.payfast.exceptions.InvalidRequestException;
 import org.apache.http.HttpEntity;
@@ -37,7 +36,7 @@ public class Notification {
 
         String pfParamString = dataToString(pfData);
 
-        boolean check1 = pfValidSignature(pfData, pfParamString, PayFastPayment.passPhrase);
+        boolean check1 = pfValidSignature(pfData, pfParamString, PayFast.PASS_PHRASE.get());
         boolean check2 = pfValidIP();
         boolean check3 = pfValidData(pfData, checks);
         boolean check4 = pfValidServerConfirmation(pfParamString);
@@ -158,24 +157,23 @@ public class Notification {
     /**
      * Compare returned data
      *
-     * @param pfData
-     * @param checks
+     * @param postData
+     * @param expectedValues
      * @return
      */
-    private static boolean pfValidData(Map<String, String[]> pfData, Map<String, String> checks) {
-
-        if (!checks.isEmpty()) {
-            for (Map.Entry<String, String> entry : checks.entrySet()) {
+    private static boolean validatePostData(Map<String, String[]> postData, Map<String, String> expectedValues) {
+        if (!expectedValues.isEmpty()) {
+            for (Map.Entry<String, String> entry : expectedValues.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                if (key.equals("amount_gross")) {
-                    if (!Arrays.asList(pfData.get("amount_gross")).contains(value)) {
+                if ("amount_gross".equals(key)) {
+                    if (!Arrays.asList(postData.get("amount_gross")).contains(value)) {
                         PayFastPayment.errorMsg.add(
                                 "Parameter 'amount_gross' does not exist in the post data or does not match expected value");
                         return false;
                     }
-                } else if (pfData.get(key) == null || pfData.get(key).length == 0
-                        || !Arrays.asList(pfData.get(key)).contains(value)) {
+                } else if (!postData.containsKey(key) || postData.get(key).length == 0
+                        || !Arrays.asList(postData.get(key)).contains(value)) {
                     PayFastPayment.errorMsg.add(
                             "Parameter '" + key + "' does not exist in the post data or does not match expected value");
                     return false;
@@ -186,6 +184,7 @@ public class Notification {
         return true;
     }
 
+
     /**
      * Perform a server request to confirm the details
      *
@@ -195,18 +194,18 @@ public class Notification {
      */
     private static boolean pfValidServerConfirmation(String pfParamString) throws InvalidRequestException {
         try {
-            HttpClient client = HttpClients.createDefault();
-            HttpPost httpPost = new HttpPost(PayFastPayment.baseUrl + "/query/validate");
-            List<NameValuePair> params = new ArrayList<>();
+
+
+
+            Map<String, String> form = new HashMap<>();
             for (String s : pfParamString.split("&")) {
                 String[] param = s.split("=");
-                params.add(new BasicNameValuePair(param[0], param[1]));
+                form.put(param[0] ,param[1]);
             }
-            httpPost.setEntity(new UrlEncodedFormEntity(params));
-            HttpResponse httpResponse = client.execute(httpPost);
-            HttpEntity entity = httpResponse.getEntity();
-            String responseBody = EntityUtils.toString(entity);
-            EntityUtils.consume(entity);
+
+            String responseBody =  HttpUtils.sendHttpPostRequest(PayFast.getApiUrl()+ "/query/validate",form);
+            System.out.println("responseBody" + responseBody);
+
             if (!responseBody.equals("VALID")) {
                 PayFastPayment.errorMsg.add("Invalid server confirmation");
                 return false;

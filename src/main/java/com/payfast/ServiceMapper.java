@@ -1,18 +1,17 @@
 package com.payfast;
 
+import com.payfast.Services.CreditCardTransactions;
+import com.payfast.Services.Refunds;
+import com.payfast.Services.Subscriptions;
+import com.payfast.Services.TransactionHistory;
+import com.payfast.paymentintegrations.CustomIntegration;
+import com.payfast.paymentintegrations.Notification;
+import com.payfast.paymentintegrations.OnsiteIntegration;
+
 import java.util.HashMap;
 import java.util.Map;
 
 
-/*
-import PayFast.PaymentIntegrations.CustomIntegration;
-import PayFast.PaymentIntegrations.Notification;
-import PayFast.PaymentIntegrations.OnsiteIntegration;
-import PayFast.Services.CreditCardTransactions;
-import PayFast.Services.Refunds;
-import PayFast.Services.Subscriptions;
-import PayFast.Services.TransactionHistory;
-*/
 
 public class ServiceMapper {
     private static final Map<String, Class<?>> MAP = new HashMap<>();
